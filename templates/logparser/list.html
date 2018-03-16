@@ -1,0 +1,25 @@
+{% extends 'logparser/base.html' %}
+{% load render_table from django_tables2 %}
+{% block content %}
+            <div class="breadcrumbs">
+                <a href="/">Начало</a>
+                &rsaquo; Запросы
+            </div>
+            <!-- Content -->
+
+            <div id="content-main">
+                <ul class="object-tools">
+                    <li>
+                      <a href="/request/add/" class="addlink">
+
+                        Добавить запрос
+                      </a>
+                    </li>
+                </ul>
+                <form action="{% url 'rqst_many_upd' %}" method="post">
+                    {% csrf_token %}
+                    {% render_table table 'django_tables2/table.html' %}
+                </form>
+            </div>
+            <!-- END Content -->
+{% endblock %}

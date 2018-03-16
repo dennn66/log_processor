@@ -1,0 +1,28 @@
+{% extends 'logparser/base.html' %}
+{% block content %}
+   {% if user == request.author %}
+       <h1>Изменение запроса</h1>
+       <form method="POST" class="post-form">{% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Save</button>
+       </form>
+   {% else %}
+        {% if request.created %}
+            <div class="date">
+                {{ request.created }}
+            </div>
+        {% endif %}
+        <p>City: {{ request.city }}</p>
+        <p>Parser: {{ request.parser }}</p>
+        <p>Username: {{ request.username }}</p>
+        <p>From Date: {{ request.from_date }}</p>
+        <p>To Date: {{ request.to_date }}</p>
+        <p>Author: {{ request.author }}</p>
+        {% if user.first_name != '' %}
+            <strong>{{ user.first_name }}</strong>,
+        {% else %}
+            <strong>{{ user }}</strong>,
+        {% endif %}
+        Вы не имеете прав на редактирование запроса пользователя {{ request.author }}
+   {% endif %}
+{% endblock %}

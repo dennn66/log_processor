@@ -1,0 +1,25 @@
+{% extends 'logparser/base.html' %}
+{% block content %}
+            <div class="breadcrumbs">
+                <a href="/">Начало</a>
+                &rsaquo; Запрос
+            </div>
+            <!-- Content -->
+            <div class="request">
+                {% if request.created %}
+                    <div class="date">
+                        {{ request.created }}
+                    </div>
+                {% endif %}
+                <p>City: {{ request.city }}</p>
+                <p>Parser: {{ request.parser }}</p>
+                <p>Username: {{ request.username }}</p>
+                <p>From Date: {{ request.from_date }}</p>
+                <p>To Date: {{ request.to_date }}</p>
+                <p>Author: {{ request.author }}</p>
+                {% if user == request.author %}
+                    <a class="btn btn-default" href="{% url 'request_edit' pk=request.pk %}"><span class="glyphicon glyphicon-pencil">Edit</span></a>
+                {% endif %}
+            </div>
+            <!-- END Content -->
+{% endblock %}

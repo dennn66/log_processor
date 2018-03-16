@@ -1,0 +1,32 @@
+{% extends 'logparser/base.html' %}
+{% block content %}
+            <div class="breadcrumbs">
+                <a href="/">Начало</a>
+                &rsaquo; Удаление запроса
+            </div>
+            <!-- Content -->
+            <div class="request">
+                {% if request.created %}
+                    <div class="date">
+                        {{ request.created }}
+                    </div>
+                {% endif %}
+                <p>City: {{ request.city }}</p>
+                <p>Parser: {{ request.parser }}</p>
+                <p>Username: {{ request.username }}</p>
+                <p>From Date: {{ request.from_date }}</p>
+                <p>To Date: {{ request.to_date }}</p>
+                <p>Author: {{ request.author }}</p>
+                {% if user == request.author %}
+                    <a class="btn btn-default" href="{% url 'request_do_delete' pk=request.pk %}"><span class="glyphicon glyphicon-pencil">Delete</span></a>
+                {% else %}
+                    {% if user.first_name != '' %}
+                        <strong>{{ user.first_name }}</strong>,
+                    {% else %}
+                        <strong>{{ user }}</strong>,
+                    {% endif %}
+                    Вы не имеете прав на удаление запроса пользователя {{ request.author }}
+                {% endif %}
+            </div>
+            <!-- END Content -->
+{% endblock %}
