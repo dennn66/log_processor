@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 import views
-import settings
+from django.conf import settings
 
 urlpatterns = [
     url(r'^$', views.request_list, name='request_list'),
