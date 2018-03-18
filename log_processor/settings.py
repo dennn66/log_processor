@@ -25,7 +25,7 @@ SECRET_KEY = 'p_k^(l3h8-3es+c19vcpo!ef(1h6qf%izwu=vwbg6_xh#-a51^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['logparser.loc']
 
 
 # Application definition
@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'logparser.apps.LogparserConfig',
     'django_tables2',
+    'mod_wsgi.server',
 ]
 
 MIDDLEWARE = [
