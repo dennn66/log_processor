@@ -25,7 +25,7 @@ SECRET_KEY = 'p_k^(l3h8-3es+c19vcpo!ef(1h6qf%izwu=vwbg6_xh#-a51^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['logparser.loc']
+ALLOWED_HOSTS = ['.logparser.loc', '10.0.2.15']
 
 
 # Application definition
@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'logparser.apps.LogparserConfig',
     'django_tables2',
     'mod_wsgi.server',
+    'django_rq',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -108,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.0/topics/i18n/
 
 LANGUAGE_CODE = 'ru-ru'
-
+DEFAULT_CHARSET = 'utf-8'
 TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
@@ -140,3 +142,26 @@ STATICFILES_FINDERS = (
 )
 
 ADMIN_MEDIA_PREFIX = '/static/admin/'
+
+# Use redis for caches
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+
+# Use the same redis as with caches for RQ
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'default',
+    },
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+RQ_SHOW_ADMIN_LINK = True
+

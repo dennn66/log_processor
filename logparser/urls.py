@@ -1,8 +1,9 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 from django.conf import settings
+from .views import TasksHomeFormView, JobTemplateView
 
 urlpatterns = [
     url(r'^$', views.request_list, name='request_list'),
@@ -14,6 +15,9 @@ urlpatterns = [
     url(r'^request/(?P<pk>\d+)/test/$', views.test, name='test'),
     url(r'^request/(?P<pk>\d+)/delete/$', views.request_delete, name='request_delete'),
     url(r'^request/(?P<pk>\d+)/do_delete/$', views.request_do_delete, name='request_do_delete'),
+    url(r'^django-rq/', include('django_rq.urls')),
+    url(r'^task/', TasksHomeFormView.as_view(), name='home'),
+    url(r'^job/(?P<job>[\d\w-]+)/$', JobTemplateView.as_view(), name='view_job'),
 ]
 
 

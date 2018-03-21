@@ -12,10 +12,65 @@ from django.core.files.storage import FileSystemStorage
 import os
 from django.conf import settings
 
+from django.views.generic.edit import FormView
+from django.views.generic import TemplateView
+from .forms import TaskForm
+from .tasks import get_url_words
+from .models import Task
+from rq.job import Job
+import django_rq
+import datetime
 
 
 # Create your views here.
 # Подробнее о QuerySets в Django можно узнать в официальной документации: https://docs.djangoproject.com/en/1.11/ref/models/querysets/
+
+
+class TasksHomeFormView(FormView):
+    """
+    A class that displays a form to read a url to read its contents and if the job
+    is to be scheduled or not and information about all the tasks and scheduled tasks.
+
+    When the form is submitted, the task will be either scheduled based on the
+    parameters of the form or will be just executed asynchronously immediately.
+    """
+    form_class = TaskForm
+    template_name = 'logparser/tasks_home.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        url = form.cleaned_data['url']
+
+        # Just execute the job asynchronously
+        get_url_words.delay(url)
+        return super(TasksHomeFormView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(TasksHomeFormView, self).get_context_data(**kwargs)
+        ctx['tasks'] = Task.objects.all().order_by('-created_on')
+        return ctx
+
+
+class JobTemplateView(TemplateView):
+    """
+    A simple template view that gets a job id as a kwarg parameter
+    and tries to fetch that job from RQ. It will then print all attributes
+    of that object using __dict__.
+    """
+    template_name = 'logparser/job.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super(JobTemplateView, self).get_context_data(**kwargs)
+        redis_conn = django_rq.get_connection('default')
+        try:
+            job = Job.fetch(self.kwargs['job'], connection=redis_conn)
+            job = job.__dict__
+        except:
+            job = None
+
+        ctx['job'] = job
+        return ctx
+
 
 def login(request):
     username = request.POST.get('username')
@@ -36,7 +91,7 @@ def request_list(request):
 
 def test(request, pk):
     user_request = get_object_or_404(UserRequest, pk=pk)
-    f = open('logparser/views.py')
+    f = open('/opt/krus/log_processor/test.txt')
     user_request.filename.save(str('logparser/tests.py'), File(f))
     return redirect('request_list')
 
