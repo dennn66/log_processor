@@ -41,7 +41,7 @@ INSTALLED_APPS = [
     'django_tables2',
     'mod_wsgi.server',
     'django_rq',
-    'django_extensions',
+    #'django_extensions',
 ]
 
 MIDDLEWARE = [
