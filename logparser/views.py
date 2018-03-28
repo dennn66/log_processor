@@ -93,6 +93,7 @@ def test(request, pk):
     user_request = get_object_or_404(UserRequest, pk=pk)
     f = open('/opt/krus/log_processor/test.txt')
     user_request.filename.save(str('logparser/tests.py'), File(f))
+    user_request.run()
     return redirect('request_list')
 
 def rqst_many_upd(request):
