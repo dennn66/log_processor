@@ -190,8 +190,8 @@ class UserRequest(models.Model):
     created =  models.DateTimeField(default=tz.now)
     filename = models.FileField(upload_to='user_media',  blank=True)
 
-    test_url = models.CharField(max_length=128)
-    job_id = models.CharField(max_length=128)
+    test_url = models.CharField(max_length=128, blank=True, null=True)
+    job_id = models.CharField(max_length=128, blank=True, null=True)
 
     def __str__(self):
         return str(self.created)
