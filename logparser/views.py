@@ -129,6 +129,7 @@ def request_new(request):
             task = form.save(commit=False)
             task.author = request.user
             task.created = tz.now()
+            task.test_url = 'https://stackoverflow.com/questions/35047924/django-exception-typenoreversematch'
             get_request_result.delay(task)
             #post.save()
             return redirect('request_list')
@@ -147,6 +148,7 @@ def request_edit(request, pk):
             task.author = request.user
             task.created = tz.now()
             task.filename.delete()
+            task.test_url = 'https://stackoverflow.com/questions/35047924/django-exception-typenoreversematch'
             get_request_result.delay(task)
             #user_request.save()
             return redirect('request_list')
