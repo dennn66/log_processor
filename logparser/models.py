@@ -217,11 +217,3 @@ class UserRequest(models.Model):
         print(str(self.get_request()))
 
 
-
-class Task(models.Model):
-    # A model to save information about an asynchronous task
-    created_on = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(max_length=128)
-    job_id = models.CharField(max_length=128)
-    result = models.CharField(max_length=128, blank=True, null=True)
-

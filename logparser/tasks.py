@@ -1,18 +1,7 @@
 import requests
-from .models import Task, UserRequest
+from .models import  UserRequest
 from rq import get_current_job
 from django_rq import job
-
-
-@job
-def get_url_words(task : Task):
-    # This creates a Task instance to save the job instance and job result
-    job = get_current_job()
-    task.job_id = job.get_id()
-    response = requests.get(task.name)
-    task.result = len(response.text)
-    task.save()
-    return task.result
 
 
 @job
