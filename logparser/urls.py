@@ -16,8 +16,6 @@ urlpatterns = [
     url(r'^request/(?P<pk>\d+)/delete/$', views.request_delete, name='request_delete'),
     url(r'^request/(?P<pk>\d+)/do_delete/$', views.request_do_delete, name='request_do_delete'),
     url(r'^django-rq/', include('django_rq.urls')),
-    url(r'^task/', TasksHomeFormView.as_view(), name='home'),
-    url(r'^job/(?P<job>[\d\w-]+)/$', JobTemplateView.as_view(), name='view_job'),
 ]
 
 

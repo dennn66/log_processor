@@ -104,6 +104,7 @@ def request_delete(request, pk):
     user_request = get_object_or_404(UserRequest, pk=pk)
     return render(request, 'logparser/request_delete.html', context={'request': user_request})
 
+@login_required
 def request_do_delete(request, pk):
     user_request = get_object_or_404(UserRequest, pk=pk)
     user_request.filename.delete()
