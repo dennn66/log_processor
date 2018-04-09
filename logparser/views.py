@@ -15,7 +15,7 @@ from django.conf import settings
 from django.views.generic.edit import FormView
 from django.views.generic import TemplateView
 from .forms import TaskForm
-from .tasks import get_url_words
+from .tasks import get_url_words, get_request_result
 from .models import Task
 from rq.job import Job
 import django_rq
@@ -126,10 +126,11 @@ def request_new(request):
     if request.method == "POST":
         form = RequestForm(request.POST)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.created = tz.now()
-            post.save()
+            task = form.save(commit=False)
+            task.author = request.user
+            task.created = tz.now()
+            get_request_result.delay(task)
+            #post.save()
             return redirect('request_list')
     else:
         form = RequestForm()
@@ -142,11 +143,12 @@ def request_edit(request, pk):
     if request.method == "POST":
         form = RequestForm(request.POST, instance=user_request)
         if form.is_valid():
-            user_request = form.save(commit=False)
-            user_request.author = request.user
-            user_request.created = tz.now()
-            user_request.filename.delete()
-            user_request.save()
+            task = form.save(commit=False)
+            task.author = request.user
+            task.created = tz.now()
+            task.filename.delete()
+            get_request_result.delay(task)
+            #user_request.save()
             return redirect('request_list')
     else:
         form = RequestForm(instance=user_request)

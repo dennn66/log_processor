@@ -16,15 +16,12 @@ def get_url_words(task : Task):
 
 
 @job
-def get_request_result(url):
+def get_request_result(task : UserRequest):
     # This creates a Task instance to save the job instance and job result
     job = get_current_job()
 
-    task = UserRequest.objects.create(
-        job_id=job.get_id(),
-        name=url
-    )
-    response = requests.get(url)
+    task.job_id=job.get_id()
+    response = requests.get(task.test_url)
     task.result = len(response.text)
     task.save()
     return task.result

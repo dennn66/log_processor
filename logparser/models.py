@@ -192,6 +192,7 @@ class UserRequest(models.Model):
 
     test_url = models.CharField(max_length=128, blank=True, null=True)
     job_id = models.CharField(max_length=128, blank=True, null=True)
+    result = models.CharField(max_length=128, blank=True, null=True)
 
     def __str__(self):
         return str(self.created)
