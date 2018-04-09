@@ -1,5 +1,9 @@
 {% extends 'logparser/base.html' %}
 {% load render_table from django_tables2 %}
+
+{% block head %}
+    <meta http-equiv="refresh" content="5">
+{% endblock %}
 {% block content %}
             <div class="breadcrumbs">
                 <a href="/">Начало</a>
