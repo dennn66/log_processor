@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import City, Collector, Source, Settings, Parser, RadiusAttributeValue, RadiusAttributeType, Dim, Counter, Index, TrafficType, TrafficSummary, UserRequest
+from .models import Task, City, Collector, Source, Settings, Parser, RadiusAttributeValue, RadiusAttributeType, Dim, Counter, Index, TrafficType, TrafficSummary, UserRequest
 
 admin.site.register(City)
 admin.site.register(Collector)
@@ -16,3 +16,4 @@ admin.site.register(Index)
 admin.site.register(TrafficType)
 admin.site.register(TrafficSummary)
 admin.site.register(UserRequest)
+admin.site.register(Task)
