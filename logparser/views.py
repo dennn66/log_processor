@@ -71,6 +71,8 @@ def request_new(request):
             task = form.save(commit=False)
             task.author = request.user
             task.created = tz.now()
+            task.result = 'posting job...'
+            task.job_id='none'
             task.save()
             get_request_result.delay(task)
             return redirect('request_list')
