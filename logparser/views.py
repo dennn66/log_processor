@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404
-from .models import City, Collector, Source, Settings, Parser, RadiusAttributeValue, RadiusAttributeType, Dim, Counter, Index, TrafficType, TrafficSummary, UserRequest
+from .models import  UserRequest
 from .forms import RequestForm
 from .tables import UserRequestTable
 from django.shortcuts import redirect
@@ -42,7 +42,11 @@ class TasksHomeFormView(FormView):
         url = form.cleaned_data['url']
 
         # Just execute the job asynchronously
-        get_url_words.delay(url)
+
+        task = Task.objects.create(
+            name=url
+        )
+        get_url_words.delay(task)
         return super(TasksHomeFormView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):

@@ -190,6 +190,9 @@ class UserRequest(models.Model):
     created =  models.DateTimeField(default=tz.now)
     filename = models.FileField(upload_to='user_media',  blank=True)
 
+    test_url = models.CharField(max_length=128)
+    job_id = models.CharField(max_length=128)
+
     def __str__(self):
         return str(self.created)
 
@@ -207,6 +210,7 @@ class UserRequest(models.Model):
                    'city': self.city.name,
                    }
         return request
+
     def run(self):
         print(str(self.get_config()))
         print(str(self.get_request()))
