@@ -10,7 +10,7 @@ def get_request_result(task : UserRequest):
     job = get_current_job()
 
     task.job_id=job.get_id()
-    task.result = 'starting job...'
+    task.result = 'processing...'
     task.save()
     response = requests.get(task.test_url)
     task.result = len(response.text)
