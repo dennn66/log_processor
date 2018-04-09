@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from . import views
 from django.conf import settings
-from .views import TasksHomeFormView, JobTemplateView
+
 
 urlpatterns = [
     url(r'^$', views.request_list, name='request_list'),
