@@ -89,8 +89,9 @@ def request_edit(request, pk):
             task.author = request.user
             task.created = tz.now()
             task.filename.delete()
+            task.save()
             get_request_result.delay(task)
-            #user_request.save()
+
             return redirect('request_list')
     else:
         form = RequestForm(instance=user_request)
