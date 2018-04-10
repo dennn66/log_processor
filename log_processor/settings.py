@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+from sys import platform
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -39,10 +40,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'logparser.apps.LogparserConfig',
     'django_tables2',
-    'mod_wsgi.server',
-    'django_rq',
-    #'django_extensions',
 ]
+
+if platform != "win32":
+    INSTALLED_APPS += [
+        'mod_wsgi.server',
+        'django_rq',
+    ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

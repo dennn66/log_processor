@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate, login
 from django.core.files import File
 
 from .tasks import  get_request_result
+from sys import platform
 
 from rq.job import Job
 import django_rq
@@ -71,10 +72,13 @@ def request_new(request):
             task = form.save(commit=False)
             task.author = request.user
             task.created = tz.now()
-            task.result = 'posting job...'
+            task.result = 'waiting...'
             task.job_id = 'none'
             task.save()
-            get_request_result.delay(task)
+            if platform != "win32":
+                get_request_result.delay(task)
+            else:
+                get_request_result(task)
             return redirect('request_list')
     else:
         form = RequestForm()
@@ -91,11 +95,13 @@ def request_edit(request, pk):
             task.author = request.user
             task.created = tz.now()
             task.filename.delete()
-            task.result = 'posting job...'
+            task.result = 'waiting...'
             task.job_id = 'none'
             task.save()
-            get_request_result.delay(task)
-
+            if platform != "win32":
+                get_request_result.delay(task)
+            else:
+                get_request_result(task)
             return redirect('request_list')
     else:
         form = RequestForm(instance=user_request)
