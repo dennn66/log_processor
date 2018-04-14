@@ -8,6 +8,12 @@ from django.conf.urls.static import static
 from django.conf import settings
 import os
 
+
+from rq import Queue
+from django_rq import get_connection
+from sys import platform
+
+
 class UserRequestTable(tables.Table):
     edit = tables.LinkColumn('request_edit', text='Edit', args=[A('pk')], orderable=False, empty_values=())
     delete = tables.LinkColumn('request_delete', text='Delete', args=[A('pk')], orderable=False, empty_values=())
@@ -22,12 +28,34 @@ class UserRequestTable(tables.Table):
 
     def render_filename(self, value, record):
         url = static('cloud-download.png')
-        if(value == None or value == ''):
+
+        if platform != "win32":
+
+            redis_conn = get_connection()
+            q = Queue(connection=redis_conn)
+            job_id = record.job_id
+
+            job = q.fetch(job_id, redis_conn)  # fetch Job from redis
+            if job.is_finished:
+                ret = value
+            elif job.is_queued:
+                ret = {'status': 'in-queue'}
+            elif job.is_started:
+                ret = {'status': 'waiting'}
+            elif job.is_failed:
+                ret = {'status': 'failed'}
+        else:
+            ret = value
+
+        if(ret == None or ret == ''):
             return mark_safe('')
         else:
-            conf = record.get_config()
-            tmp_path = conf['tmp_path']
+            if ret == value:
+                conf = record.get_config()
+                tmp_path = conf['tmp_path']
 
-            href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
-            return mark_safe('<a href="' + href + '">' + value + '</a>')
-            #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
+                href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
+                return mark_safe('<a href="' + href + '">' + ret + '</a>')
+                #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
+            else:
+                return mark_safe(ret)

@@ -67,15 +67,6 @@ class User:
         return self.username
 
 class Parser:
-    #radius_log_path: str
-    #tmp_path: str
-    #log_path: str
-    #city: City
-    #from_date: dt.datetime
-    #to_date: dt.datetime
-    #username : str
-    #raw_df : pd.DataFrame
-    #ssh_user : User
 
     def __init__(self, radius_log_path : str,  tmp_path : str, log_path : str, parser_config):
         self.radius_log_path = radius_log_path
