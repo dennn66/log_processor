@@ -37,7 +37,7 @@ class UserRequestTable(tables.Table):
 
             job = q.fetch(job_id, redis_conn)  # fetch Job from redis
             if job.is_finished:
-                ret = value
+                ret = {'status': 'finished'}
             elif job.is_queued:
                 ret = {'status': 'in-queue'}
             elif job.is_started:
@@ -45,17 +45,15 @@ class UserRequestTable(tables.Table):
             elif job.is_failed:
                 ret = {'status': 'failed'}
         else:
-            ret = value
+            ret = {'status': value}
 
-        if(ret == None or ret == ''):
+        if(value == None or value == ''):
             return mark_safe('')
         else:
-            if ret == value:
-                conf = record.get_config()
-                tmp_path = conf['tmp_path']
 
-                href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
-                return mark_safe('<a href="' + href + '">' + ret + '</a>')
-                #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
-            else:
-                return mark_safe(ret)
+            conf = record.get_config()
+            tmp_path = conf['tmp_path']
+
+            href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
+            return mark_safe('<a href="' + href + '">' + ret['status'] + '</a>')
+            #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
