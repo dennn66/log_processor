@@ -50,12 +50,12 @@ class UserRequestTable(tables.Table):
             ret = {'status': value}
 
         if(value == None or value == ''):
-            return mark_safe('')
+            return mark_safe('cc')
         else:
 
             conf = record.get_config()
             tmp_path = conf['tmp_path']
 
             href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
-            return mark_safe('<a href="' + href + '">' + ret['status'] + '</a>')
+            return mark_safe('<a href="' + href + '">' + 'gg ' + ret['status'] + '</a>')
             #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
