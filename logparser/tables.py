@@ -30,20 +30,22 @@ class UserRequestTable(tables.Table):
         url = static('cloud-download.png')
 
         if platform != "win32":
+            try:
+                redis_conn = get_connection()
+                q = Queue(connection=redis_conn)
+                job_id = record.job_id
 
-            redis_conn = get_connection()
-            q = Queue(connection=redis_conn)
-            job_id = record.job_id
-
-            job = q.fetch(job_id, redis_conn)  # fetch Job from redis
-            if job.is_finished:
-                ret = {'status': 'finished'}
-            elif job.is_queued:
-                ret = {'status': 'in-queue'}
-            elif job.is_started:
-                ret = {'status': 'waiting'}
-            elif job.is_failed:
-                ret = {'status': 'failed'}
+                job = q.fetch(job_id, redis_conn)  # fetch Job from redis
+                if job.is_finished:
+                    ret = {'status': 'finished'}
+                elif job.is_queued:
+                    ret = {'status': 'in-queue'}
+                elif job.is_started:
+                    ret = {'status': 'waiting'}
+                elif job.is_failed:
+                    ret = {'status': 'failed'}
+            except:
+                ret = {'status': 'error'}
         else:
             ret = {'status': value}
 
