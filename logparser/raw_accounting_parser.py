@@ -1,7 +1,5 @@
-import yaml
 
 import sys
-import getopt
 
 import numpy as np
 import pandas as pd
@@ -11,11 +9,11 @@ import dateutil as du
 import pytz
 
 import os
-
 import paramiko
 
+
 import time
-from collections import OrderedDict
+#from collections import OrderedDict
 
 class City:
     name = ''
@@ -91,6 +89,34 @@ class Parser:
         self.traffic_types = parser_config.get('traffic_types')
         self.traffic_summary = parser_config.get('traffic_summary')
 
+    def __init__(self, config,  request):
+        print(str(config))
+        print(str(request))
+        self.radius_log_path = config.get('radius_log_path')
+        self.tmp_path = config.get('tmp_path')
+        self.log_path = config.get('log_path')
+        self.tags = config.get('parser_config')['tags']
+        self.dims = config.get('parser_config')['dims']
+        self.counters = config.get('parser_config')['counters']
+        self.index = config.get('parser_config')['index']
+        self.traffic_types = config.get('parser_config')['traffic_types']
+        self.traffic_summary = config.get('parser_config')['traffic_summary']
+
+        self.ssh_user = User(config.get('ssh_user').get('username'), config.get('ssh_user').get('privatekeyfile'))
+        self.city = City(request.get('city'),
+                         config.get('collectors').get(request.get('city')).get('timezone'),
+                           config.get('collectors').get(request.get('city')).get('logpath'))
+        self.city.load(config)
+
+        self.from_date = self.set_date_tz(request.get('from_date'), self.city.timezone)
+        self.to_date = self.set_date_tz(request.get('to_date'), self.city.timezone)
+        self.username = request.get('username')
+        print("Parsing logs from", self.from_date, "to", self.to_date)
+        print('Filtred by username: ' + self.username)
+        self.filename = ''
+        self.mkdir_if_not_exist(self.radius_log_path)
+        self.mkdir_if_not_exist(self.tmp_path)
+        self.mkdir_if_not_exist(self.log_path)
 
     def __str__(self):
         return str(self.city)
@@ -306,8 +332,9 @@ class Parser:
             traffic = pd.DataFrame()
             summary = pd.DataFrame()
 
-            t = time.time().is_integer()
-            writer = pd.ExcelWriter(self.tmp_path + '/output_' + str(time.time()) + '.xlsx')
+            self.filename = self.tmp_path + '/output_' + str(time.time()) + '.xlsx'
+
+            writer = pd.ExcelWriter(self.filename)
             summary.to_excel(writer, 'summary')  # , engine='xlwt')
             resampled.to_excel(writer, 'traffic_hourly')  # , engine='xlwt')
             traffic.to_excel(writer, 'traffic_by_updates')  # , engine='xlwt')
@@ -392,64 +419,11 @@ class Parser:
         else:
             print("no data found")
 
-
-def main(argv):
-    info = argv[0]+' -p <from_date>-<to_date> -u <username> \n'+\
-        'Example: \n'+\
-        argv[0]+' -p 01.09.2017-01.10.2017 -u 10.0.0.1\n'+\
-        argv[0]+' -p 01.09.2017/01:00:00-01.10.2017/23:59:59 -u 10.0.0.1'
+        return self.filename
 
 
 
-    username = ''
-    #username = '46.52.244.220'
-    from_date_s = "29.01.2018 10:40:00+05:00"
-    to_date_s = "29.01.2018 12:00:00+05:00"
-    city_name = 'tula'
-    settings = '../../conf/logparser.yaml'
-    radius_log_path = '../../radius-logs'
-    tmp_path = '../../tmp'
-    log_path = '../../log'
 
-    try:
-        opts, args = getopt.getopt(argv[1:], "hp:u:c:s:", ["period=", "username=", "city=", "settings="])
-    except getopt.GetoptError:
-        print( info)
-        sys.exit(2)
-
-    for opt, arg in opts:
-        if opt == "-h":
-            print( info)
-            sys.exit()
-        elif opt in ("-p", "--period"):
-            from_date_s, to_date_s = arg.split("-")
-        elif opt in ("-u", "--username"):
-            username = arg
-        elif opt in ("-c", "--city"):
-            city_name = arg
-        elif opt in ("-s", "--settings"):
-            settings = arg
-
-    with open(settings, 'r') as stream:
-        try:
-            config = yaml.load(stream)
-        except yaml.YAMLError as exc:
-            print("Error in config file " + settings)
-            print(exc)
-            sys.exit(2)
-
-
-
-    parser = Parser( radius_log_path, tmp_path, log_path, config.get('parser_config'))
-    parser.ssh_user = User(config.get('ssh_user').get('username'), config.get('ssh_user').get('privatekeyfile'))
-    parser.city = City(city_name, config.get('collectors').get(city_name).get('timezone'), config.get('collectors').get(city_name).get('logpath'))
-    parser.city.load(config)
-    parser.set_filter(from_date_s, to_date_s, username)
-    parser.read_data()
-    parser.save()
-
-
-    print(parser)
 
 
 
@@ -463,6 +437,3 @@ def main(argv):
 
 '''
 
-
-if __name__ == '__main__':
-    main(sys.argv[0:])

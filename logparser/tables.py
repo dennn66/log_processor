@@ -1,37 +1,33 @@
 import django_tables2 as tables
-import django_tables2.utils as tu
 from django_tables2.utils import A  # alias for Accessor
 
 from django.utils.safestring import mark_safe
 from .models import UserRequest
-import itertools
-counter = itertools.count()
 
-class CheckBoxColumnWithValueInName(tables.CheckBoxColumn):
-    def render(self, value, bound_column):  # pylint: disable=W0221
-        default = {
-            'type': 'checkbox',
-            'name': bound_column.name + str(value),
-            'value': value
-        }
-        general = self.attrs.get('input')
-        specific = self.attrs.get('td__input')
-        attrs = tu.AttributeDict(default, **(specific or general or {}))
-        return mark_safe('<input %s/>' % attrs.as_html())
+from django.conf.urls.static import static
+from django.conf import settings
+import os
 
 class UserRequestTable(tables.Table):
-    #check_column = CheckBoxColumnWithValueInName(accessor='pk', orderable=False)
     edit = tables.LinkColumn('request_edit', text='Edit', args=[A('pk')], orderable=False, empty_values=())
     delete = tables.LinkColumn('request_delete', text='Delete', args=[A('pk')], orderable=False, empty_values=())
-    test = tables.LinkColumn('test', text='Test', args=[A('pk')], orderable=False, empty_values=())
     # еще нужные поля
 
     class Meta:
         empty_text = u'Объекты, удовлетворяющие критериям поиска, не найдены...'
         model = UserRequest
+        attrs = {'class': 'paleblue'}
         sequence = ('created', 	'city', 	'username', 	'from_date', 	'to_date', 	'parser', 	'author', 'filename') # тут столбцы, выводимые в таблицу
-        #exclude = tuple( set(model._meta.get_fields()) - set(sequence))
         exclude = 'id'
-        #order_by = ('-id',)
-        # add class="paleblue" to <table> tag
-        #attrs = {"class": "paleblue", "id": lambda: "table_%d" % next(counter)}
+
+    def render_filename(self, value, record):
+        url = static('cloud-download.png')
+        if(value == None or value == ''):
+            return mark_safe('')
+        else:
+            conf = record.get_config()
+            tmp_path = conf['tmp_path']
+
+            href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
+            return mark_safe('<a href="' + href + '">' + value + '</a>')
+            #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')

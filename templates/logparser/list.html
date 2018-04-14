@@ -20,7 +20,7 @@
                       </a>
                     </li>
                 </ul>
-                <form action="{% url 'rqst_many_upd' %}" method="post">
+                <form action="{% url 'request_list' %}" method="post">
                     {% csrf_token %}
                     {% render_table table 'django_tables2/table.html' %}
                 </form>

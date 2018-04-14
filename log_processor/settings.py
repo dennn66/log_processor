@@ -26,7 +26,7 @@ SECRET_KEY = 'p_k^(l3h8-3es+c19vcpo!ef(1h6qf%izwu=vwbg6_xh#-a51^'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['.logparser.loc', '10.0.2.15']
+ALLOWED_HOSTS = ['.logparser.loc', '10.0.2.15', 'localhost']
 
 
 # Application definition
@@ -127,7 +127,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
-#STATIC_URL = '/static/'
 LOGIN_REDIRECT_URL = '/'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
@@ -137,15 +136,16 @@ MEDIA_URL = '/media/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'files', 'static')
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'static'),
-)
+#STATICFILES_DIRS = (
+#    os.path.join(BASE_DIR, 'static'),
+#)
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
 ADMIN_MEDIA_PREFIX = '/static/admin/'
+
 
 # Use redis for caches
 CACHES = {

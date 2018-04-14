@@ -3,6 +3,8 @@ from django.core.files import File
 from django.db import models
 import requests
 from rq import get_current_job
+from django.conf import settings as app_settings
+import os
 
 # Create your models here.
 
@@ -30,13 +32,13 @@ class City(models.Model):
 
         bras_sources = set(bras_sources)
 
-        collectors = [ {'collectors':{self.name:
+        collectors =  {'collectors':{self.name:
                          {'timezone': self.timezone,
-                         'collector_host': collector_hosts,
+                         'collector_hosts': collector_hosts,
                          'bras_sources': bras_sources,
                          'logpath' : logpath
                          }
-                      }}]
+                      }}
         return collectors
 
     def __str__(self):
@@ -63,18 +65,18 @@ class Source (models.Model):
 class Settings(models.Model):
     name = models.CharField(default='default', max_length=200)
     ssh_username = models.CharField(max_length=20)
-    ssh_key = models.CharField(default='../key', max_length=200)
-    radius_log_path = models.CharField(default='../radius-logs', max_length=200)
-    tmp_path = models.CharField(default='../tmp', max_length=200)
-    log_path = models.CharField(default='../log', max_length=200)
+    ssh_key = models.CharField(default='./key', max_length=200)
+    radius_log_path = models.CharField(default='./radius-logs', max_length=200)
+    tmp_path = models.CharField(default='./tmp', max_length=200)
+    log_path = models.CharField(default='./log', max_length=200)
 
     def get_config(self):
-        settings = [
-            {'ssh_user': {'privatekeyfile': self.ssh_key, 'username': self.ssh_username}},
-            {'radius_log_path': self.radius_log_path},
-            {'tmp_path': self.tmp_path},
-            {'log_path': self.log_path},
-        ]
+        settings = {
+            'ssh_user': {'privatekeyfile': self.ssh_key, 'username': self.ssh_username},
+            'radius_log_path':  os.path.join(app_settings.MEDIA_ROOT, "user_media", self.radius_log_path),
+            'tmp_path':  os.path.join(app_settings.MEDIA_ROOT, "user_media", self.tmp_path),
+            'log_path':  os.path.join(app_settings.MEDIA_ROOT, "user_media", self.log_path),
+        }
         return settings
 
 
@@ -90,34 +92,34 @@ class Parser(models.Model):
 
     def get_config(self):
         tags_obj = RadiusAttributeValue.objects.filter(parser=self)
-        tags = []
+        tags = {}
         for tag in tags_obj:
-            tags += [{tag.tag : tag.name.name}]
+            tags = {**tags, **{str(tag.tag) : str(tag.name.name)}}
 
         dim_obj = Dim.objects.filter(parser=self)
         dims = []
         for dim in dim_obj:
-            dims += [dim.name]
+            dims += [str(dim.name)]
 
         cnt_obj = Counter.objects.filter(parser=self)
         counters = []
         for cnt in cnt_obj:
-            counters += [cnt.name]
+            counters += [str(cnt.name)]
 
         indx_obj = Index.objects.all() #filter(parser=self)
         index = []
         for indx in indx_obj:
-            index += [indx.name]
+            index += [str(indx.name)]
 
         trf_obj = TrafficType.objects.filter(parser=self)
-        traffic_types = []
+        traffic_types = {}
         for trf in trf_obj:
-            traffic_types += [{trf.type_id: trf.name}]
+            traffic_types = {**traffic_types, **{int(trf.type_id, 16): str(trf.name)}}
 
         tsum_obj = TrafficSummary.objects.filter(parser=self)
         traffic_summary = []
         for tsum in tsum_obj:
-            traffic_summary += [tsum.name]
+            traffic_summary += [str(tsum.name)]
 
         parser_config = { 'tags' : tags,
                           'counters': counters,
@@ -126,7 +128,7 @@ class Parser(models.Model):
                           'traffic_types' :traffic_types,
                           'traffic_summary': traffic_summary}
 
-        return [{'parser_config': parser_config}]
+        return {'parser_config': parser_config}
 
     def __str__(self):
         return self.name
@@ -188,20 +190,15 @@ class UserRequest(models.Model):
     from_date = models.DateTimeField(default=tz.now)
     to_date = models.DateTimeField(default=tz.now)
     created =  models.DateTimeField(default=tz.now)
-    filename = models.FileField(upload_to='user_media',  blank=True)
-
-    test_url = models.CharField(max_length=128, blank=True, null=True)
+    filename = models.CharField(default='', max_length=128, blank=True, null=True)
     job_id = models.CharField(max_length=128, blank=True, null=True)
-    result = models.CharField(max_length=128, blank=True, null=True)
 
     def __str__(self):
         return str(self.created)
 
     def get_config(self):
         settings = Settings.objects.filter(name='default').first()
-        config = settings.get_config()
-        config += self.city.get_config()
-        config += self.parser.get_config()
+        config = {**settings.get_config(), **self.city.get_config(), **self.parser.get_config()}
         return config
 
     def get_request(self):
@@ -212,8 +209,5 @@ class UserRequest(models.Model):
                    }
         return request
 
-    def run(self):
-        print(str(self.get_config()))
-        print(str(self.get_request()))
 
 
