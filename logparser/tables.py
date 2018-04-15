@@ -25,7 +25,7 @@ class UserRequestTable(tables.Table):
         model = UserRequest
         attrs = {'class': 'paleblue'}
         sequence = ('created', 	'city', 	'username', 	'from_date', 	'to_date', 	'parser', 	'author', 'filename') # тут столбцы, выводимые в таблицу
-        exclude = 'id'
+        exclude = ('id', 'job_id')
 
     def render_filename(self, value, record):
         url = static('cloud-download.png')
