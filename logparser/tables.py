@@ -31,6 +31,8 @@ class UserRequestTable(tables.Table):
 
         if platform != "win32":
             try:
+                ret = {'status': 'test'}
+                '''
                 redis_conn = get_connection()
                 q = Queue(connection=redis_conn)
                 job_id = record.job_id
@@ -44,13 +46,14 @@ class UserRequestTable(tables.Table):
                     ret = {'status': 'waiting'}
                 elif job.is_failed:
                     ret = {'status': 'failed'}
+                '''
             except:
                 ret = {'status': 'error'}
         else:
             ret = {'status': value}
 
         if(value == None or value == ''):
-            return mark_safe('cc')
+            return mark_safe('cc ' + value)
         else:
 
             conf = record.get_config()
