@@ -32,8 +32,8 @@ class UserRequestTable(tables.Table):
         if platform != "win32":
             try:
                 ret = {'status': 'test'}
-                '''
                 redis_conn = get_connection()
+                '''
                 q = Queue(connection=redis_conn)
                 job_id = record.job_id
 
