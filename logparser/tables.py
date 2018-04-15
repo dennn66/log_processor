@@ -12,6 +12,7 @@ import os
 from rq import Queue
 from django_rq import get_connection
 from sys import platform
+from rq.job import Job
 
 
 class UserRequestTable(tables.Table):
@@ -33,11 +34,10 @@ class UserRequestTable(tables.Table):
             try:
                 ret = {'status': 'test'}
                 redis_conn = get_connection()
-                q = Queue(connection=redis_conn)
                 job_id = record.job_id
 
-                job = q.fetch(job_id, redis_conn)  # fetch Job from redis
-                '''
+                job = Job.fetch(job_id, redis_conn)  # fetch Job from redis
+
                 if job.is_finished:
                     ret = {'status': 'finished'}
                 elif job.is_queued:
@@ -46,7 +46,7 @@ class UserRequestTable(tables.Table):
                     ret = {'status': 'waiting'}
                 elif job.is_failed:
                     ret = {'status': 'failed'}
-                '''
+
             except BaseException as e:
                 ret = {'status': str(e)}
         else:
