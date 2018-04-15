@@ -35,8 +35,9 @@ class UserRequestTable(tables.Table):
                 ret = {'status': 'test'}
                 redis_conn = get_connection()
                 job_id = record.job_id
-
-                job = Job.fetch(job_id.job, redis_conn)  # fetch Job from redis
+                q = Queue(connection=redis_conn)
+                job = q.fetch_job(job_id)
+                #job = Job.fetch(job_id, redis_conn)  # fetch Job from redis
 
                 if job.is_finished:
                     ret = {'status': 'finished'}
@@ -48,7 +49,7 @@ class UserRequestTable(tables.Table):
                     ret = {'status': 'failed'}
 
             except BaseException as e:
-                ret = {'status':  str(job_id) + ' ' + str(e)}
+                ret = {'status':  str(e)}
         else:
             ret = {'status': value}
 
