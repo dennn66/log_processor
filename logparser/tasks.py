@@ -22,7 +22,7 @@ def get_request_result(task : UserRequest):
     if filename != None and filename != '':
         task.filename = os.path.relpath(filename, tmp_path)
     else:
-        task.filename = ''
+        task.filename = 'none'
     task.save()
     return task.filename
 

@@ -52,7 +52,7 @@ def request_new(request):
             task.created = tz.now()
             task.result = 'waiting...'
             task.job_id = 'none'
-            task.filename = ''
+            task.filename = 'none'
             task.save()
             if platform != "win32":
                 get_request_result.delay(task)
@@ -73,7 +73,7 @@ def request_edit(request, pk):
             task = form.save(commit=False)
             task.author = request.user
             task.created = tz.now()
-            task.filename = ''
+            task.filename = 'none'
             #task.filename.delete()
             task.job_id = 'none'
             task.save()
