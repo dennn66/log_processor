@@ -35,9 +35,9 @@ class UserRequestTable(tables.Table):
                 redis_conn = get_connection()
                 q = Queue(connection=redis_conn)
                 job_id = record.job_id
-                '''
 
                 job = q.fetch(job_id, redis_conn)  # fetch Job from redis
+                '''
                 if job.is_finished:
                     ret = {'status': 'finished'}
                 elif job.is_queued:
@@ -53,7 +53,7 @@ class UserRequestTable(tables.Table):
             ret = {'status': value}
 
         if(value == None or value == ''):
-            return mark_safe('cc ' + value)
+            return mark_safe('<a href="">' + 'cc ' + ret['status'] + '</a>')
         else:
 
             conf = record.get_config()
