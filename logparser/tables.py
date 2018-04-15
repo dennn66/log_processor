@@ -48,7 +48,7 @@ class UserRequestTable(tables.Table):
                     ret = {'status': 'failed'}
                 '''
             except BaseException as e:
-                ret = {'status': e}
+                ret = {'status': str(e)}
         else:
             ret = {'status': value}
 
