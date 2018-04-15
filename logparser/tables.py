@@ -33,8 +33,8 @@ class UserRequestTable(tables.Table):
             try:
                 ret = {'status': 'test'}
                 redis_conn = get_connection()
-                '''
                 q = Queue(connection=redis_conn)
+                '''
                 job_id = record.job_id
 
                 job = q.fetch(job_id, redis_conn)  # fetch Job from redis
