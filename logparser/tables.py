@@ -47,8 +47,8 @@ class UserRequestTable(tables.Table):
                 elif job.is_failed:
                     ret = {'status': 'failed'}
                 '''
-            except:
-                ret = {'status': 'error'}
+            except BaseException as e:
+                ret = {'status': e}
         else:
             ret = {'status': value}
 
