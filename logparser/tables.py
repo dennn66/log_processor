@@ -40,16 +40,16 @@ class UserRequestTable(tables.Table):
                 #job = Job.fetch(job_id, redis_conn)  # fetch Job from redis
 
                 if job.is_finished:
-                    ret = {'status': 'finished'}
+                    ret = {'status': 'ready'}
                 elif job.is_queued:
                     ret = {'status': 'in-queue'}
                 elif job.is_started:
-                    ret = {'status': 'waiting'}
+                    ret = {'status': 'running...'}
                 elif job.is_failed:
                     ret = {'status': 'failed'}
 
             except BaseException as e:
-                ret = {'status':  str(e)}
+                ret = {'status':  'starting...'}
         else:
             ret = {'status': value}
 
