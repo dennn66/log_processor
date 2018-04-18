@@ -12,7 +12,7 @@ import os
 from rq import Queue
 from django_rq import get_connection
 from sys import platform
-from rq.job import Job
+import logging
 
 
 class UserRequestTable(tables.Table):
@@ -29,16 +29,13 @@ class UserRequestTable(tables.Table):
 
     def render_filename(self, value, record):
         url = static('cloud-download.png')
-
+        #logger = logging.getLogger('logparser.tables')
+        #logger.debug('Hello logs!')
         if platform != "win32":
             try:
-                ret = {'status': 'test'}
                 redis_conn = get_connection()
-                job_id = record.job_id
                 q = Queue(connection=redis_conn)
-                job = q.fetch_job(job_id)
-                #job = Job.fetch(job_id, redis_conn)  # fetch Job from redis
-
+                job = q.fetch_job(record.job_id)
                 if job.is_finished:
                     ret = {'status': 'ready'}
                 elif job.is_queued:
@@ -47,8 +44,7 @@ class UserRequestTable(tables.Table):
                     ret = {'status': 'running...'}
                 elif job.is_failed:
                     ret = {'status': 'failed'}
-
-            except BaseException as e:
+            except:
                 ret = {'status':  'starting...'}
         else:
             ret = {'status': value}
@@ -60,4 +56,4 @@ class UserRequestTable(tables.Table):
             tmp_path = conf['tmp_path']
             href = os.path.join(settings.MEDIA_URL, os.path.relpath(os.path.join(tmp_path, value), settings.MEDIA_ROOT))
             return mark_safe('<a href="' + href + '">' + ret['status'] + '</a>')
-            #return mark_safe('<a href="' + href + '"><img src="' + url + '"></a>')
+

@@ -10,6 +10,7 @@ from django.core.files import File
 
 from .tasks import  get_request_result
 from sys import platform
+import os
 
 from rq.job import Job
 import django_rq
@@ -73,7 +74,12 @@ def request_edit(request, pk):
             task = form.save(commit=False)
             task.author = request.user
             task.created = tz.now()
+            if(task.filename !=  None and task.filename !=  'none' and task.filename !=  '' ):
+                conf = task.get_config()
+                tmp_path = conf['tmp_path']
+                os.remove(os.path.join(tmp_path, task.filename))
             task.filename = 'none'
+
             #task.filename.delete()
             task.job_id = 'none'
             task.save()
@@ -95,6 +101,10 @@ def request_delete(request, pk):
 @login_required
 def request_do_delete(request, pk):
     user_request = get_object_or_404(UserRequest, pk=pk)
+    if (user_request.filename != None and user_request.filename != 'none' and user_request.filename != ''):
+        conf = user_request.get_config()
+        tmp_path = conf['tmp_path']
+        os.remove(os.path.join(tmp_path, user_request.filename))
     #user_request.filename.delete()
     user_request.delete()
     return redirect('request_list')
